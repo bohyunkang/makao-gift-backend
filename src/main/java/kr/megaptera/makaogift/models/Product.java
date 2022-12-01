@@ -4,10 +4,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import kr.megaptera.makaogift.dtos.ProductDto;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 public class Product {
@@ -24,12 +20,6 @@ public class Product {
     private String description;
 
     private String imageUrl;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     public Product() {
     }
