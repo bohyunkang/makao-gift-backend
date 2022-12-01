@@ -18,6 +18,12 @@ class BackdoorControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    void resetDatabase() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/backdoor/reset-database"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void setupDatabase() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/backdoor/setup-database"))
                 .andExpect(status().isOk());

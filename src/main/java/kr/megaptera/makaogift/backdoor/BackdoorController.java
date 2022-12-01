@@ -16,6 +16,13 @@ public class BackdoorController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @GetMapping("/reset-database")
+    public String resetDatabase() {
+        jdbcTemplate.execute("DELETE FROM product");
+
+        return "OK!";
+    }
+
     @GetMapping("/setup-database")
     public String setupDatabase() {
         jdbcTemplate.execute("DELETE FROM product");
