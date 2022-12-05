@@ -37,5 +37,29 @@ public class Product {
     public ProductDto toDto() {
         return new ProductDto(id, title, price, maker, description, imageUrl);
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Long getPrice() {
+        return price;
+    }
+
+    public String getMaker() {
+        return maker;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
 }
 
