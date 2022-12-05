@@ -18,6 +18,12 @@ class BackdoorControllerTest {
     private MockMvc mockMvc;
 
     @Test
+    void changeAmount() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/backdoor/change-amount?userId=1&amount=20000"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void resetDatabase() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get("/backdoor/reset-database"))
                 .andExpect(status().isOk());

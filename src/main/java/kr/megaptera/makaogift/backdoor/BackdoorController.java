@@ -1,62 +1,91 @@
 package kr.megaptera.makaogift.backdoor;
 
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/backdoor")
 @Transactional
 public class BackdoorController {
     private JdbcTemplate jdbcTemplate;
+    private PasswordEncoder passwordEncoder;
 
-    public BackdoorController(JdbcTemplate jdbcTemplate) {
+    public BackdoorController(JdbcTemplate jdbcTemplate,
+                              PasswordEncoder passwordEncoder) {
         this.jdbcTemplate = jdbcTemplate;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @GetMapping("/change-amount")
+    public String changeAmount(
+            @RequestParam Long userId,
+            @RequestParam Long amount
+    ) {
+        jdbcTemplate.update("UPDATE person SET amount=? WHERE id=?", amount, userId);
+
+        return "Change amount completed!";
     }
 
     @GetMapping("/reset-database")
     public String resetDatabase() {
+        jdbcTemplate.execute("DELETE FROM person");
         jdbcTemplate.execute("DELETE FROM product");
 
-        return "OK!";
+        return "Reset completed!";
     }
+
 
     @GetMapping("/setup-database")
     public String setupDatabase() {
+        LocalDateTime now = LocalDateTime.now();
+
+        jdbcTemplate.execute("DELETE FROM person");
         jdbcTemplate.execute("DELETE FROM product");
+
+        jdbcTemplate.update("" +
+                        "INSERT INTO person(id, name, username, amount, " +
+                        "encoded_password, created_at, updated_at) " +
+                        "VALUES(1, '강보니', 'boni1234', 50000, ?, ?, ?)",
+                passwordEncoder.encode("Test1234!"), now, now
+        );
 
         jdbcTemplate.update("INSERT INTO product(" +
                         "id, title, maker, price, description, image_url)" +
-                        " VALUES(1,'치즈닭갈비 170g(1개)','아워홈','3320','치즈닭갈비 170g(1개)','https://img.danawa.com/prod_img/500000/086/042/img/15042086_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (2,'청정원 호밍스 춘천식 치즈닭갈비 220g(1개)','대상','5580','청정원 호밍스 춘천식 치즈닭갈비 220g(1개)','https://img.danawa.com/prod_img/500000/983/344/img/16344983_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (3,'춘천식 닭갈비 350g(1개)','아워홈','4120','춘천식 닭갈비 350g(1개)','https://img.danawa.com/prod_img/500000/914/473/img/13473914_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (4,'안주이닭 치즈불닭 210g(1개)','하림','5890','안주이닭 치즈불닭 210g(1개)','https://img.danawa.com/prod_img/500000/425/077/img/16077425_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (5,'동물복지 수비드 닭가슴살 오리지널 130g(1개)','참프레','1980','동물복지 수비드 닭가슴살 오리지널 130g(1개)','https://img.danawa.com/prod_img/500000/428/750/img/15750428_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (6,'똑똑한식단 리얼탄두리맛 안심 닭가슴살 100g(1개)','헬스앤뷰티','2950','똑똑한식단 리얼탄두리맛 안심 닭가슴살 100g(1개)','https://img.danawa.com/prod_img/500000/567/155/img/13155567_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (7,'본죽 더 부드러운 닭가슴살 장조림 130g(1개)','본아이에프','3960','본죽 더 부드러운 닭가슴살 장조림 130g(1개)','https://img.danawa.com/prod_img/500000/077/303/img/18303077_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (8,'잇츠나우 한입 닭가슴살 오리지널 100g(1개)','푸드나무','2770','잇츠나우 한입 닭가슴살 오리지널 100g(1개)','https://img.danawa.com/prod_img/500000/403/337/img/18337403_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (9,'햇살닭 떡갈비맛 닭가슴살 함박스테이크 100g(1개)','햇살푸드시스템','1850','햇살닭 떡갈비맛 닭가슴살 함박스테이크 100g(1개)','https://img.danawa.com/prod_img/500000/040/781/img/15781040_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (10,'매콤한 칠리 닭가슴살 110g(1개)','아워홈','1900','매콤한 칠리 닭가슴살 110g(1개)','https://img.danawa.com/prod_img/500000/050/063/img/15063050_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (11,'바로드숑 닭가슴살 비엔나 소시지 오리지널 100g(1개)','아침','2270','바로드숑 닭가슴살 비엔나 소시지 오리지널 100g(1개)','https://img.danawa.com/prod_img/500000/745/667/img/15667745_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (12,'마이닭 닭가슴살 더블 함박스테이크 매콤치즈 100g(1개)','미트리','1800','마이닭 닭가슴살 더블 함박스테이크 매콤치즈 100g(1개)','https://img.danawa.com/prod_img/500000/467/843/img/15843467_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (13,'심야식당 뼈없는 불닭발 160g(1개)','동원F&B','4550','심야식당 뼈없는 불닭발 160g(1개)','https://img.danawa.com/prod_img/500000/300/588/img/5588300_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (14,'청정원 안주야 논현동 포차스타일 직화무뼈닭발 160g(1개)','대상','6590','청정원 안주야 논현동 포차스타일 직화무뼈닭발 160g(1개)','https://img.danawa.com/prod_img/500000/089/945/img/5945089_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (15,'한끼애 직화불닭발 150g(3개)','한성기업','14500','한끼애 직화불닭발 150g(3개)','https://img.danawa.com/prod_img/500000/245/610/img/11610245_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (16,'청정원 안주야 논현동 포차스타일 직화무뼈닭발 160g(2개)','대상','15210','청정원 안주야 논현동 포차스타일 직화무뼈닭발 160g(2개)','https://img.danawa.com/prod_img/500000/237/291/img/9291237_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (17,'직화 오돌뼈 150g(3개)','S레이디','12290','직화 오돌뼈 150g(3개)','https://img.danawa.com/prod_img/500000/377/042/img/15042377_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (18,'서울식 야시장맛 매콤오돌뼈 160g(1개)','아워홈','3970','서울식 야시장맛 매콤오돌뼈 160g(1개)','https://img.danawa.com/prod_img/500000/604/668/img/8668604_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (19,'심야식당 매콤오돌뼈 160g(1개)','동원F&B','4570','심야식당 매콤오돌뼈 160g(1개)','https://img.danawa.com/prod_img/500000/537/588/img/5588537_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (20,'치즈오돌뼈 150g(1개)','아워홈','3900','치즈오돌뼈 150g(1개)','https://img.danawa.com/prod_img/500000/846/041/img/15041846_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (21,'양념오돌뼈볶음 400g(2개)','임꺽정푸드시스템','14250','양념오돌뼈볶음 400g(2개)','https://img.danawa.com/prod_img/500000/257/380/img/16380257_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (22,'청정원 안주야 통마늘 제육오돌뼈 160g(1개)','대상','4780','청정원 안주야 통마늘 제육오돌뼈 160g(1개)','https://img.danawa.com/prod_img/500000/070/760/img/15760070_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (23,'양념오돌뼈볶음 400g(1개)','임꺽정푸드시스템','7540','양념오돌뼈볶음 400g(1개)','https://img.danawa.com/prod_img/500000/233/380/img/16380233_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (24,'쉐프원 안주야 매콤오돌뼈볶음 280g(1개)','대상','4500','쉐프원 안주야 매콤오돌뼈볶음 280g(1개)','https://img.danawa.com/prod_img/500000/533/286/img/9286533_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (25,'청정원 안주야 소양돼지곱창 160g(1개)','대상','4780','청정원 안주야 소양돼지곱창 160g(1개)','https://img.danawa.com/prod_img/500000/933/070/img/16070933_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (26,'청정원 안주야 논현동 포차스타일 직화모듬곱창 260g(1개)','대상','6470','청정원 안주야 논현동 포차스타일 직화모듬곱창 260g(1개)','https://img.danawa.com/prod_img/500000/894/944/img/5944894_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (27,'주당맛집 소곱창 180g(2개)','진지','28500','주당맛집 소곱창 180g(2개)','https://img.danawa.com/prod_img/500000/169/133/img/18133169_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
-                "  (28,'직화 양념 돼지곱창 250g(1개)','족발야시장','6890','직화 양념 돼지곱창 250g(1개)','https://img.danawa.com/prod_img/500000/706/325/img/18325706_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
+                        " VALUES  (1,'테디베어 어드벤트 캘린더 250g (해외)(1개)','린트','36200','테디베어 어드벤트 캘린더 250g (해외)(1개)','https://img.danawa.com/prod_img/500000/133/709/img/12709133_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (2,'테디 어드벤트 캘린더 310g (해외)(1개)','린트','29900','테디 어드벤트 캘린더 310g (해외)(1개)','https://img.danawa.com/prod_img/500000/686/684/img/15684686_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (3,'테디베어 어드벤트 캘린더 172g (해외)(1개)','린트','36200','테디베어 어드벤트 캘린더 172g (해외)(1개)','https://img.danawa.com/prod_img/500000/497/681/img/15681497_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (4,'루돌프 산타 어드벤트 캘린더 160g (해외)(1개)','린트','25900','루돌프 산타 어드벤트 캘린더 160g (해외)(1개)','https://img.danawa.com/prod_img/500000/584/684/img/15684584_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (5,'크리스마스 트리 어드벤트 캘린더 120g (해외)(1개)','린트','47090','크리스마스 트리 어드벤트 캘린더 120g (해외)(1개)','https://img.danawa.com/prod_img/500000/350/684/img/15684350_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (6,'HELLO 어드벤트캘린더 150g (해외)(1개)','린트','34500','HELLO 어드벤트캘린더 150g (해외)(1개)','https://img.danawa.com/prod_img/500000/089/180/img/18180089_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (7,'크리스마스 드림 어드벤트 캘린더 281g (해외)(1개)','린트','59800','크리스마스 드림 어드벤트 캘린더 281g (해외)(1개)','https://img.danawa.com/prod_img/500000/614/684/img/15684614_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (8,'골드 피스 어드벤트 캘린더 156g (해외)(1개)','린트','34490','골드 피스 어드벤트 캘린더 156g (해외)(1개)','https://img.danawa.com/prod_img/500000/741/710/img/12710741_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (9,'린도르 어쏘티드 트러플 초콜릿 (5가지맛) 600g(1개)','린트','30090','린도르 어쏘티드 트러플 초콜릿 (5가지맛) 600g(1개)','https://img.danawa.com/prod_img/500000/988/164/img/7164988_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (10,'린도 스트라치텔라 화이트 초콜릿 트러플 720g(1개)','린트','62500','린도 스트라치텔라 화이트 초콜릿 트러플 720g(1개)','https://img.danawa.com/prod_img/500000/765/533/img/10533765_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (11,'엑설런스 85% 코코아 다크 100g(1개)','린트','3400','엑설런스 85% 코코아 다크 100g(1개)','https://img.danawa.com/prod_img/500000/198/469/img/4469198_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (12,'린도 밀크 초콜릿 트러플 720g(1개)','린트','38790','린도 밀크 초콜릿 트러플 720g(1개)','https://img.danawa.com/prod_img/500000/023/534/img/10534023_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (13,'킨더 크리스마스 어드벤트 캘린더 2021 135g (해외)(1개)','페레로','35400','킨더 크리스마스 어드벤트 캘린더 2021 135g (해외)(1개)','https://img.danawa.com/prod_img/500000/170/681/img/15681170_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (14,'킨더 크리스마스 어드벤트 캘린더 2021 152g (해외)(1개)','페레로','43190','킨더 크리스마스 어드벤트 캘린더 2021 152g (해외)(1개)','https://img.danawa.com/prod_img/500000/116/681/img/15681116_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (15,'킨더 막시 믹스 어드벤트 캘린더 2021 (해외)(1개)','페레로','46490','킨더 막시 믹스 어드벤트 캘린더 2021 (해외)(1개)','https://img.danawa.com/prod_img/500000/312/680/img/15680312_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (16,'킨더 믹스 어드벤트 캘린더 3D 하우스 (해외)(1개)','페레로','37570','킨더 믹스 어드벤트 캘린더 3D 하우스 (해외)(1개)','https://img.danawa.com/prod_img/500000/027/683/img/15683027_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (17,'킨더 초콜릿 T8 8개입 100g(10개)','페레로','20450','킨더 초콜릿 T8 8개입 100g(10개)','https://img.danawa.com/prod_img/500000/598/626/img/2626598_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (18,'킨더 부에노 T2 43g(15개)','페레로','15290','킨더 부에노 T2 43g(15개)','https://img.danawa.com/prod_img/500000/490/702/img/13702490_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (19,'킨더 초콜릿 맥시 21g(36개)','페레로','13680','킨더 초콜릿 맥시 21g(36개)','https://img.danawa.com/prod_img/500000/513/365/img/5365513_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (20,'킨더조이 걸 20g(24개)','페레로','28500','킨더조이 걸 20g(24개)','https://img.danawa.com/prod_img/500000/377/137/img/6137377_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (21,'쿠앤크 키세스 초코바 어드벤트 캘린더 212g (해외)(1개)','허쉬','45300','쿠앤크 키세스 초코바 어드벤트 캘린더 212g (해외)(1개)','https://img.danawa.com/prod_img/500000/733/814/img/15814733_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (22,'키세스 초콜릿 크리스마스 2021 어드벤트 캘린더 107g (해외)(2개)','허쉬','41110','키세스 초콜릿 크리스마스 2021 어드벤트 캘린더 107g (해외)(2개)','https://img.danawa.com/prod_img/500000/670/814/img/15814670_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (23,'어드밴트 캘린더 265g(1개)','허쉬','18590','어드밴트 캘린더 265g(1개)','https://img.danawa.com/prod_img/500000/089/201/img/18201089_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (24,'리세스 러버 초콜릿 크리스마스 2021 어드벤트 캘린더 107g (해외)(1개)','허쉬','32040','리세스 러버 초콜릿 크리스마스 2021 어드벤트 캘린더 107g (해외)(1개)','https://img.danawa.com/prod_img/500000/682/709/img/12709682_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (25,'초콜릿 칩 싱글 쿠키 50g(10개)','허쉬','7260','초콜릿 칩 싱글 쿠키 50g(10개)','https://img.danawa.com/prod_img/500000/199/511/img/4511199_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (26,'화이트 초콜릿 칩 위드 아몬드 쿠키 50g(10개)','허쉬','7640','화이트 초콜릿 칩 위드 아몬드 쿠키 50g(10개)','https://img.danawa.com/prod_img/500000/900/641/img/5641900_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (27,'쿠키앤크림 스낵사이즈 904g(1개)','허쉬','16500','쿠키앤크림 스낵사이즈 904g(1개)','https://img.danawa.com/prod_img/500000/677/725/img/3725677_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "  (28,'크리미 아몬드 초콜릿 100g(1개)','허쉬','2110','크리미 아몬드 초콜릿 100g(1개)','https://img.danawa.com/prod_img/500000/713/463/img/4463713_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
                 "  (29,'심야식당 불막창 160g(1개)','동원F&B','3910','심야식당 불막창 160g(1개)','https://img.danawa.com/prod_img/500000/493/588/img/5588493_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
                 "  (30,'청정원 안주야 논현동 포차스타일 불막창 160g(1개)','대상','7720','청정원 안주야 논현동 포차스타일 불막창 160g(1개)','https://img.danawa.com/prod_img/500000/541/188/img/5188541_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
                 "  (31,'심야식당 훈제막창 600g(1개)','동원F&B','17290','심야식당 훈제막창 600g(1개)','https://img.danawa.com/prod_img/500000/105/207/img/9207105_1.jpg??shrink=360:360&_v=20221130203949'),\n" +
@@ -131,6 +160,6 @@ public class BackdoorController {
                 "  (100,'휘낭시에 골드 9개입 252g(1개)','신라명과','15240','휘낭시에 골드 9개입 252g(1개)','https://img.danawa.com/prod_img/500000/326/780/img/10780326_1.jpg??shrink=360:360&_v=20221130204220')\n"
         );
 
-        return "OK!";
+        return "Insert completed!";
     }
 }
