@@ -61,5 +61,10 @@ public class Product {
     public String getImageUrl() {
         return imageUrl;
     }
+
+    public static Product fake(Long id) {
+        return new Product(id, "이건 제목", 10_000L, "제조사", "이건 설명",
+                "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg");
+    }
 }
 

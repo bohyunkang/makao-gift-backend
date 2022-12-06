@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import kr.megaptera.makaogift.dtos.UserCreationDto;
 import kr.megaptera.makaogift.dtos.UserDto;
+import kr.megaptera.makaogift.exceptions.NotEnoughAmount;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -70,6 +71,16 @@ public class User {
 
     public Long amount() {
         return amount;
+    }
+
+    public void order(Product product, Integer quantity) {
+        Long totalPrice = product.getPrice() * quantity;
+
+        if (totalPrice > this.amount) {
+            throw new NotEnoughAmount();
+        }
+
+        this.amount -= product.getPrice() * quantity;
     }
 
     public boolean authenticate(String password, PasswordEncoder passwordEncoder) {
