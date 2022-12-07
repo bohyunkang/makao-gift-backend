@@ -1,5 +1,8 @@
 package kr.megaptera.makaogift.controllers;
 
+import kr.megaptera.makaogift.config.EnableMockMvc;
+import kr.megaptera.makaogift.dtos.OrderDto;
+import kr.megaptera.makaogift.dtos.OrdersDto;
 import kr.megaptera.makaogift.dtos.ProductDto;
 import kr.megaptera.makaogift.exceptions.OrderFailed;
 import kr.megaptera.makaogift.models.Order;
@@ -18,13 +21,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import static org.hamcrest.core.StringContains.containsString;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
+@EnableMockMvc
 @WebMvcTest(OrderController.class)
 @ActiveProfiles("test")
 class OrderControllerTest {
@@ -41,7 +47,10 @@ class OrderControllerTest {
     private JwtUtil jwtUtil;
 
     private String token;
+
     private ProductDto productDto;
+
+    private OrderDto orderDto;
 
     @BeforeEach
     void setup() {
@@ -49,6 +58,50 @@ class OrderControllerTest {
 
         productDto = new ProductDto(1L, "상품1", 10_000L, "제조사1",
                 "이 상품1은 이러이러하답니다", "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg");
+
+        orderDto = new OrderDto(1L, 1, 10_000L, "전제나",
+                "서울시 사랑구 행복동", "메리 크리스마스!", productDto, LocalDateTime.now(), LocalDateTime.now());
+    }
+
+    @Test
+    void orders() throws Exception {
+        given(orderService.orders("boni1234"))
+                .willReturn(new OrdersDto(List.of(orderDto)));
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/orders")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        containsString("\"orders\":[")
+                ));
+    }
+
+    @Test
+    void ordersWithWrongToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/orders")
+                        .header("Authorization", "Bearer xxx"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void orderDetail() throws Exception {
+        given(orderService.detail(any(), any()))
+                .willReturn(orderDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/orders/1")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(content().string(
+                        containsString("\"product\":{")
+                ));
+    }
+
+
+    @Test
+    void orderDetailWithWrongToken() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get("/orders/1")
+                        .header("Authorization", "Bearer xxx"))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

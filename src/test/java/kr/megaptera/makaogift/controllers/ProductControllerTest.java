@@ -1,5 +1,6 @@
 package kr.megaptera.makaogift.controllers;
 
+import kr.megaptera.makaogift.config.EnableMockMvc;
 import kr.megaptera.makaogift.exceptions.ProductNotFound;
 import kr.megaptera.makaogift.models.Product;
 import kr.megaptera.makaogift.services.ProductService;
@@ -25,6 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@EnableMockMvc
 @WebMvcTest(ProductController.class)
 @ActiveProfiles("test")
 class ProductControllerTest {
@@ -33,17 +35,6 @@ class ProductControllerTest {
 
     @MockBean
     private ProductService productService;
-
-    @Autowired
-    private WebApplicationContext context;
-
-    @BeforeEach
-    public void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(context)
-                .addFilters(new CharacterEncodingFilter("UTF-8", true))
-                .alwaysDo(print())
-                .build();
-    }
 
     @Test
     void products() throws Exception {
