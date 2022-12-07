@@ -1,6 +1,10 @@
 package kr.megaptera.makaogift.services;
 
+import kr.megaptera.makaogift.dtos.OrderDto;
+import kr.megaptera.makaogift.dtos.OrdersDto;
+import kr.megaptera.makaogift.exceptions.InvalidUser;
 import kr.megaptera.makaogift.exceptions.OrderFailed;
+import kr.megaptera.makaogift.exceptions.OrderNotFound;
 import kr.megaptera.makaogift.models.Order;
 import kr.megaptera.makaogift.models.Product;
 import kr.megaptera.makaogift.models.User;
@@ -10,6 +14,7 @@ import kr.megaptera.makaogift.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,6 +36,55 @@ class OrderServiceTest {
         productRepository = mock(ProductRepository.class);
         orderRepository = mock(OrderRepository.class);
         orderService = new OrderService(userRepository, productRepository, orderRepository);
+    }
+
+    @Test
+    void orders() {
+        User user = User.fake("boni1234");
+
+        given(productRepository.findById(any()))
+                .willReturn(Optional.of(Product.fake(1L)));
+
+        given(orderRepository.findAllByUsername(any()))
+                .willReturn(List.of(Order.fake()));
+
+        OrdersDto ordersDto = orderService.orders(user.username());
+
+        assertThat(ordersDto).isNotNull();
+        assertThat(ordersDto.getOrders().get(0).getProduct().getTitle())
+                .isEqualTo("이건 제목");
+    }
+
+    @Test
+    void orderDetail() {
+        User user = User.fake("boni1234");
+
+        given(productRepository.findById(any()))
+                .willReturn(Optional.of(Product.fake(1L)));
+
+        given(orderRepository.findById(any()))
+                .willReturn(Optional.of(Order.fake()));
+
+        OrderDto orderDto = orderService.detail(1L, user.username());
+
+        assertThat(orderDto.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void orderDetailWithOtherUser() {
+        given(orderRepository.findById(any()))
+                .willReturn(Optional.of(Order.fake()));
+
+        assertThrows(InvalidUser.class, () -> {
+            orderService.detail(1L, Order.fake().getUsername() + "xxx");
+        });
+    }
+
+    @Test
+    void orderDetailNotFound() {
+        assertThrows(OrderNotFound.class, () -> {
+            orderService.detail(1L, "boni1234");
+        });
     }
 
     @Test

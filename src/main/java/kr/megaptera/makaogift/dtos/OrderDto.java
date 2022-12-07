@@ -1,26 +1,12 @@
-package kr.megaptera.makaogift.models;
+package kr.megaptera.makaogift.dtos;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import kr.megaptera.makaogift.dtos.OrderCreationDto;
-import kr.megaptera.makaogift.dtos.OrderDto;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "ORDERS")
-public class Order {
-    @Id
-    @GeneratedValue
+public class OrderDto {
     private Long id;
-
-    private String username;
-
-    private Long productId;
 
     private Integer quantity;
 
@@ -32,46 +18,33 @@ public class Order {
 
     private String message;
 
+    private ProductDto product;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    public Order() {
+    public OrderDto() {
     }
 
-    public Order(Long id, String username, Long productId, Integer quantity, Long totalPrice,
-                 String receiver, String address, String message) {
+    public OrderDto(Long id, Integer quantity, Long totalPrice, String receiver,
+                    String address, String message, ProductDto productDto,
+                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
-        this.username = username;
-        this.productId = productId;
         this.quantity = quantity;
         this.totalPrice = totalPrice;
         this.receiver = receiver;
         this.address = address;
         this.message = message;
-    }
-
-    public static Order fake() {
-        return new Order(1L, "boni1234", 1L, 1, 10_000L, "전제나",
-                "서울시 사랑구 행복동 888번지 7층", "제나야! Merry Christmas!");
-    }
-
-    public OrderCreationDto toCreationDto() {
-        return new OrderCreationDto(id, productId, quantity);
+        this.product = productDto;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public Long getProductId() {
-        return productId;
     }
 
     public Integer getQuantity() {
@@ -92,6 +65,10 @@ public class Order {
 
     public String getMessage() {
         return message;
+    }
+
+    public ProductDto getProduct() {
+        return product;
     }
 
     public LocalDateTime getCreatedAt() {
