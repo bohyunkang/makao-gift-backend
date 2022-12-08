@@ -150,4 +150,55 @@ class OrderServiceTest {
             orderService.order(username, productId, quantity, receiver, address, message);
         });
     }
+
+    @Test
+    void orderWithBlankReceiver() {
+        given(userRepository.findByUsername(any()))
+                .willReturn(Optional.of(User.fake("boni1234")));
+
+        String username = "boni1234";
+        Long productId = 1L;
+        Integer quantity = 1;
+        String receiver = "";
+        String address = "서울시 사랑구 행복동 888번지 7층";
+        String message = "제나야! Merry Christmas!";
+
+        assertThrows(OrderFailed.class, () -> {
+            orderService.order(username, productId, quantity, receiver, address, message);
+        });
+    }
+
+    @Test
+    void orderWithBlankAddress() {
+        given(userRepository.findByUsername(any()))
+                .willReturn(Optional.of(User.fake("boni1234")));
+
+        String username = "boni1234";
+        Long productId = 1L;
+        Integer quantity = 1;
+        String receiver = "전제나";
+        String address = "";
+        String message = "제나야! Merry Christmas!";
+
+        assertThrows(OrderFailed.class, () -> {
+            orderService.order(username, productId, quantity, receiver, address, message);
+        });
+    }
+
+    @Test
+    void orderWithInvalidReceiver() {
+        given(userRepository.findByUsername(any()))
+                .willReturn(Optional.of(User.fake("boni1234")));
+
+        String username = "boni1234";
+        Long productId = 1L;
+        Integer quantity = 1;
+        String receiver = "하하하하하하하하이렇게긴이름도보낼수있는지확인할거야";
+        String address = "서울시 사랑구 행복동 888번지 7층";
+        String message = "제나야! Merry Christmas!";
+
+        assertThrows(OrderFailed.class, () -> {
+            orderService.order(username, productId, quantity, receiver, address, message);
+        });
+    }
 }

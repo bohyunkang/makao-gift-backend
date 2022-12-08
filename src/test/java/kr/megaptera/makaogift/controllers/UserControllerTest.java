@@ -1,6 +1,7 @@
 package kr.megaptera.makaogift.controllers;
 
 import kr.megaptera.makaogift.exceptions.UserNotFound;
+import kr.megaptera.makaogift.exceptions.UsernameAlreadyTaken;
 import kr.megaptera.makaogift.models.User;
 import kr.megaptera.makaogift.services.UserService;
 import kr.megaptera.makaogift.utils.JwtUtil;
@@ -70,7 +71,6 @@ class UserControllerTest {
 
     }
 
-
     @Test
     void register() throws Exception {
         given(userService.create(any(), any(), any()))
@@ -88,5 +88,24 @@ class UserControllerTest {
                 .andExpect(content().string(
                         containsString("\"username\":\"boni1234\"")
                 ));
+    }
+
+    @Test
+    void registerWithAlreadyTakenUsername() throws Exception {
+        given(userService.detail(any()))
+                .willReturn(User.fake("boni1234"));
+
+        given(userService.create(any(), any(), any()))
+                .willThrow(new UsernameAlreadyTaken("boni1234"));
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{" +
+                                "\"name\":\"강보니\"," +
+                                "\"username\":\"boni1234\"," +
+                                "\"password\":\"Test1234!\"," +
+                                "\"confirmPassword\":\"Test1234!\"" +
+                                "}"))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -5,7 +5,9 @@ import kr.megaptera.makaogift.dtos.UserCreationDto;
 import kr.megaptera.makaogift.dtos.UserDto;
 import kr.megaptera.makaogift.dtos.UserRegistrationDto;
 import kr.megaptera.makaogift.exceptions.PasswordNotMatch;
+import kr.megaptera.makaogift.exceptions.RegisterFailed;
 import kr.megaptera.makaogift.exceptions.UserNotFound;
+import kr.megaptera.makaogift.exceptions.UsernameAlreadyTaken;
 import kr.megaptera.makaogift.models.User;
 import kr.megaptera.makaogift.services.UserService;
 import org.springframework.http.HttpStatus;
@@ -59,5 +61,17 @@ public class UserController {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public String userNotFound() {
         return "User not found!";
+    }
+
+    @ExceptionHandler(UsernameAlreadyTaken.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String usernameAlreadyTaken() {
+        return "Username already taken!";
+    }
+
+    @ExceptionHandler(RegisterFailed.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public String registerFailed() {
+        return "Register failed";
     }
 }

@@ -1,6 +1,8 @@
 package kr.megaptera.makaogift.services;
 
+import kr.megaptera.makaogift.exceptions.RegisterFailed;
 import kr.megaptera.makaogift.exceptions.UserNotFound;
+import kr.megaptera.makaogift.exceptions.UsernameAlreadyTaken;
 import kr.megaptera.makaogift.models.User;
 import kr.megaptera.makaogift.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -69,5 +71,68 @@ class UserServiceTest {
         assertThat(user).isNotNull();
         assertThat(user.amount()).isEqualTo(initialAmount);
         verify(userRepository).save(any());
+    }
+
+    @Test
+    void createWithAlreadyTakenUsername() {
+        String name = "테스트용";
+        String username = "boni1234";
+        String password = "Test1234!";
+
+        assertThrows(UsernameAlreadyTaken.class, () -> userService.create(name, username, password));
+    }
+
+    @Test
+    void createWithBlankName() {
+        String name = "";
+        String username = "test123";
+        String password = "Test1234!";
+
+        assertThrows(RegisterFailed.class, () -> userService.create(name, username, password));
+    }
+
+    @Test
+    void createWithBlankUsername() {
+        String name = "테스트용";
+        String username = "";
+        String password = "Test1234!";
+
+        assertThrows(RegisterFailed.class, () -> userService.create(name, username, password));
+    }
+
+    @Test
+    void createWithBlankPassword() {
+        String name = "테스트용";
+        String username = "test123";
+        String password = "";
+
+        assertThrows(RegisterFailed.class, () -> userService.create(name, username, password));
+    }
+
+    @Test
+    void createWithInvalidName() {
+        String name = "하하하하하하하하호호호호호호호호";
+        String username = "test123";
+        String password = "Test1234!";
+
+        assertThrows(RegisterFailed.class, () -> userService.create(name, username, password));
+    }
+
+    @Test
+    void createWithInvalidUserName() {
+        String name = "테스트용";
+        String username = "Xxx";
+        String password = "Test1234!";
+
+        assertThrows(RegisterFailed.class, () -> userService.create(name, username, password));
+    }
+
+    @Test
+    void createWithInvalidPassword() {
+        String name = "테스트용";
+        String username = "test123";
+        String password = "ㅎㅎ";
+
+        assertThrows(RegisterFailed.class, () -> userService.create(name, username, password));
     }
 }
