@@ -49,7 +49,6 @@ public class OrderController {
         return orderService.detail(id, username);
     }
 
-    // TODO: 입력값 예외처리 기능 추가 구현 필요!
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public OrderCreationDto order(

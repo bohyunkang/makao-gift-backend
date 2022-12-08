@@ -7,6 +7,7 @@ import kr.megaptera.makaogift.exceptions.InvalidUser;
 import kr.megaptera.makaogift.exceptions.OrderFailed;
 import kr.megaptera.makaogift.exceptions.OrderNotFound;
 import kr.megaptera.makaogift.exceptions.ProductNotFound;
+import kr.megaptera.makaogift.exceptions.RegisterFailed;
 import kr.megaptera.makaogift.models.Order;
 import kr.megaptera.makaogift.models.Product;
 import kr.megaptera.makaogift.models.User;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -75,6 +77,15 @@ public class OrderService {
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new OrderFailed());
+
+
+        if (receiver.isBlank() || address.isBlank()) {
+            throw new OrderFailed();
+        }
+
+        if (!Pattern.matches("^[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]{3,7}$", receiver)) {
+            throw new OrderFailed();
+        }
 
         user.order(product, quantity);
 
