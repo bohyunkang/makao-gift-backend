@@ -37,6 +37,7 @@ public class BackdoorController {
     public String resetDatabase() {
         jdbcTemplate.execute("DELETE FROM person");
         jdbcTemplate.execute("DELETE FROM product");
+        jdbcTemplate.execute("DELETE FROM orders");
 
         return "Reset completed!";
     }
@@ -48,6 +49,7 @@ public class BackdoorController {
 
         jdbcTemplate.execute("DELETE FROM person");
         jdbcTemplate.execute("DELETE FROM product");
+        jdbcTemplate.execute("DELETE FROM orders");
 
         jdbcTemplate.update("" +
                         "INSERT INTO person(id, name, username, amount, " +
@@ -56,9 +58,72 @@ public class BackdoorController {
                 passwordEncoder.encode("Test1234!"), now, now
         );
 
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES (1, 'boni1234', 1, 25900, '전제나', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 6, ?, ?)", now.minusDays(1), now.minusDays(1)
+        );
+
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES(2, 'boni1234', 1, 36200, '최쥬쥬', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 1, ?, ?)", now.minusDays(1).plusHours(1), now.minusDays(1).plusHours(1)
+        );
+
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES(3, 'boni1234', 1, 47090, '최째째', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 5, ?, ?)", now.minusDays(1).plusHours(2), now.minusDays(1).plusHours(2)
+        );
+
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES(4, 'boni1234', 1, 34500, '김뚜루', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 6, ?, ?)", now.minusDays(1).plusHours(3), now.minusDays(1).plusHours(3)
+        );
+
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES(5, 'boni1234', 1, 17180, '박윈터', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 79, ?, ?)", now.minusDays(1).plusHours(4), now.minusDays(1).plusHours(4)
+        );
+
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES(6, 'boni1234', 1, 34490, '이닝닝', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 8, ?, ?)",  now.minusDays(1).plusHours(5), now.minusDays(1).plusHours(5)
+        );
+
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES(7, 'boni1234', 1, 38790, '팜하니', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 12, ?, ?)", now.minusDays(1).plusHours(6), now.minusDays(1).plusHours(6)
+        );
+
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES(8, 'boni1234', 1, 43190, '다니엘', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 14, ?, ?)", now.minusDays(1).plusHours(7), now.minusDays(1).plusHours(7)
+        );
+
+        jdbcTemplate.update("" +
+                "INSERT INTO orders(id, username, quantity, total_price, " +
+                "receiver, address, message, product_id, created_at, updated_at) " +
+                "VALUES(9, 'boni1234', 1, 45300, '이닝닝', '서울시 사랑구 행복동 77번지', " +
+                "'메리 크리스마스!', 21, ?, ?)", now.minusDays(1).plusHours(8), now.minusDays(1).plusHours(8)
+        );
+
         jdbcTemplate.update("INSERT INTO product(" +
-                        "id, title, maker, price, description, image_url)" +
-                        " VALUES  (1,'테디베어 어드벤트 캘린더 250g (해외)(1개)','린트','36200','테디베어 어드벤트 캘린더 250g (해외)(1개)','https://img.danawa.com/prod_img/500000/133/709/img/12709133_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
+                "id, title, maker, price, description, image_url)" +
+                " VALUES  (1,'테디베어 어드벤트 캘린더 250g (해외)(1개)','린트','36200','테디베어 어드벤트 캘린더 250g (해외)(1개)','https://img.danawa.com/prod_img/500000/133/709/img/12709133_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
                 "  (2,'테디 어드벤트 캘린더 310g (해외)(1개)','린트','29900','테디 어드벤트 캘린더 310g (해외)(1개)','https://img.danawa.com/prod_img/500000/686/684/img/15684686_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
                 "  (3,'테디베어 어드벤트 캘린더 172g (해외)(1개)','린트','36200','테디베어 어드벤트 캘린더 172g (해외)(1개)','https://img.danawa.com/prod_img/500000/497/681/img/15681497_1.jpg??shrink=360:360&_v=20221130204509'),\n" +
                 "  (4,'루돌프 산타 어드벤트 캘린더 160g (해외)(1개)','린트','25900','루돌프 산타 어드벤트 캘린더 160g (해외)(1개)','https://img.danawa.com/prod_img/500000/584/684/img/15684584_1.jpg??shrink=360:360&_v=20221130204509'),\n" +

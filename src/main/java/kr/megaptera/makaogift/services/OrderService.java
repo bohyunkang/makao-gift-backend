@@ -2,6 +2,7 @@ package kr.megaptera.makaogift.services;
 
 import kr.megaptera.makaogift.dtos.OrderDto;
 import kr.megaptera.makaogift.dtos.OrdersDto;
+import kr.megaptera.makaogift.dtos.PagesDto;
 import kr.megaptera.makaogift.exceptions.AuthenticationError;
 import kr.megaptera.makaogift.exceptions.InvalidUser;
 import kr.megaptera.makaogift.exceptions.OrderFailed;
@@ -14,6 +15,10 @@ import kr.megaptera.makaogift.models.User;
 import kr.megaptera.makaogift.repositories.OrderRepository;
 import kr.megaptera.makaogift.repositories.ProductRepository;
 import kr.megaptera.makaogift.repositories.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,8 +42,12 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    public OrdersDto orders(String username) {
-        List<Order> orders = orderRepository.findAllByUsername(username);
+    public OrdersDto orders(String username, Integer page, Integer size) {
+        Sort sort = Sort.by("createdAt").descending();
+
+        Pageable pageable = PageRequest.of(page - 1, size, sort);
+
+        Page<Order> orders = orderRepository.findAllByUsername(username, pageable);
 
         List<OrderDto> orderDtos = orders.stream()
                 .map(order -> {
@@ -51,7 +60,9 @@ public class OrderService {
                 })
                 .collect(Collectors.toList());
 
-        return new OrdersDto(orderDtos);
+        PagesDto pagesDto = new PagesDto(orders.getTotalPages());
+
+        return new OrdersDto(orderDtos, pagesDto);
     }
 
     public OrderDto detail(Long id, String username) {
