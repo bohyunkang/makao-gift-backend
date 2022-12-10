@@ -32,7 +32,9 @@ public class MakaogiftApplication {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**").allowedOrigins("*");
+				registry.addMapping("/**")
+						.allowedOrigins("*")
+						.allowedMethods("*");
 			}
 
 			@Override
