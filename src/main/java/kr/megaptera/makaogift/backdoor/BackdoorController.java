@@ -1,5 +1,6 @@
 package kr.megaptera.makaogift.backdoor;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/backdoor")
 @Transactional
+@Profile("!production")
 public class BackdoorController {
     private JdbcTemplate jdbcTemplate;
     private PasswordEncoder passwordEncoder;
