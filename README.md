@@ -2,7 +2,7 @@
 
 ![image](https://user-images.githubusercontent.com/65386533/206635384-31f7b845-6fad-4c8c-a451-32c3ee229678.png)
 
-![image](https://user-images.githubusercontent.com/65386533/206635256-2507c9d5-ed56-4f8c-ae9d-16426588edf8.png)
+![image](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2F7tCg3%2FbtrTgRwPC1T%2FlwokYAPRKU3mxx3KsHg7M1%2Fimg.png)
 
 
 ## 📆 작업 기간
